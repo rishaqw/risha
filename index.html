@@ -4,7 +4,8 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Outfit:wght@200;300;400&display=swap">
 <style>
 /* Layout concept: an infinite off-white grid board. Name sits at the origin; click zooms the
-   camera out, six flowing stems draw outward, each stem unfolds a zig-zag chain of frames. */
+   camera out, six flowing stems draw outward, each stem unfolds frames. Photos grow into
+   bigger frames on the same board instead of a lightbox. */
 :root {
   --bg: #f3f2ee;
   --grid: #e8e6df;
@@ -99,6 +100,7 @@ button { font: inherit; color: inherit; }
 .win.show { opacity: 1; transform: none; pointer-events: auto; }
 .win:hover { box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
 .win.sel { box-shadow: 0 0 0 1px var(--accent), var(--shadow); }
+.win.feat { border-color: var(--ink); }
 .win .h { position: absolute; width: 7px; height: 7px; background: var(--card); border: 1px solid var(--accent); display: none; }
 .win.sel .h { display: block; }
 .h.a { left: -4px; top: -4px; } .h.b { right: -4px; top: -4px; } .h.c { left: -4px; bottom: -4px; } .h.d { right: -4px; bottom: -4px; }
@@ -109,7 +111,7 @@ button { font: inherit; color: inherit; }
   font: 300 10px/1 var(--mono); letter-spacing: .03em; color: var(--muted);
 }
 .win .bar i { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
-.win .bar span { margin-left: 6px; }
+.win .bar span { margin-left: 6px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .win .body { flex: 1; min-height: 0; padding: 12px; display: flex; flex-direction: column; gap: 10px; user-select: text; cursor: auto; }
 
 /* window content */
@@ -120,10 +122,20 @@ button { font: inherit; color: inherit; }
 .ph.p2 { background: linear-gradient(135deg, var(--p2a), var(--p2b)); }
 .ph.p3 { background: linear-gradient(135deg, var(--p3a), var(--p3b)); }
 .ph img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.ph figcaption { position: absolute; left: 8px; bottom: 6px; font: 300 9.5px/1.2 var(--mono); color: var(--ink); opacity: .7; }
+.ph .cap { position: absolute; left: 8px; bottom: 6px; font: 300 9.5px/1.2 var(--mono); color: var(--ink); opacity: .7; }
+button.ph { border: 0; padding: 0; display: block; width: 100%; text-align: left; cursor: zoom-in; }
+button.ph:hover { box-shadow: 0 0 0 1px var(--accent); }
+.grid.ev { flex: none; height: 128px; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(2, 1fr); }
+.grid.ev.four { grid-template-columns: repeat(2, 1fr); }
+.artists { flex: none; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.artist { height: 104px; }
+.artist b { position: absolute; left: 10px; right: 8px; bottom: 9px; font: 300 22px/1.05 var(--display); color: var(--ink); }
+.artist small { position: absolute; left: 10px; top: 9px; font: 300 8.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); opacity: .65; }
+.strip { flex: none; display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; height: 44px; }
 .video { flex: 1; display: grid; place-items: center; }
 .play { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--ink); display: grid; place-items: center; }
 .play::after { content: ""; margin-left: 3px; border-left: 10px solid var(--ink); border-top: 6px solid transparent; border-bottom: 6px solid transparent; }
+a.play:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); }
 .scrub { position: absolute; left: 10px; right: 10px; bottom: 10px; height: 1px; background: color-mix(in srgb, var(--ink) 25%, transparent); }
 .scrub i { display: block; width: 34%; height: 100%; background: var(--ink); }
 .time { position: absolute; right: 10px; bottom: 16px; font: 300 9.5px/1 var(--mono); color: var(--ink); opacity: .7; }
@@ -153,10 +165,17 @@ button { font: inherit; color: inherit; }
 .log b { color: var(--ink); font-weight: 400; }
 .prose p { margin: 0 0 8px; font-size: 12.5px; line-height: 1.6; }
 .prose p:last-child { margin: 0; }
-.kick { font: 300 9.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); flex: none; }
+.kick { font: 300 9.5px/1.5 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); flex: none; }
 .ttl { font: 300 21px/1.15 var(--display); flex: none; }
+.ttl.sm { font-size: 18px; }
+.ttl.lg { font-size: 28px; line-height: 1.05; }
+.sub { font: 300 11.5px/1.4 var(--body); color: var(--muted); flex: none; }
+.gear { font: 300 10px/1.5 var(--mono); color: var(--muted); flex: none; }
+.album { margin-top: auto; align-self: flex-start; font: 400 10.5px/1.4 var(--mono); color: var(--ink); text-decoration: none; background: none; border: 0; border-bottom: 1px solid var(--border); padding: 0 0 1px; cursor: pointer; }
+.album:hover { color: var(--accent); border-color: var(--accent); }
+.album.soon { color: var(--muted); border-bottom: 0; cursor: default; }
 .about-head { display: flex; gap: 12px; align-items: center; flex: none; }
-.avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--p1a), var(--p3b)); flex: none; }
+.avatar { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--p1a), var(--p3b)); flex: none; object-fit: cover; }
 .about-head b { display: block; font: 300 24px/1.1 var(--display); }
 .about-head span { font: 300 10.5px/1.4 var(--mono); color: var(--muted); }
 .mail { font: 300 24px/1.15 var(--display); overflow-wrap: anywhere; }
@@ -166,6 +185,18 @@ button { font: inherit; color: inherit; }
 .links a:last-child { border-bottom: 0; }
 .links a span { font: 300 10.5px/1.2 var(--mono); color: var(--muted); }
 .links a:hover span { color: var(--accent); }
+
+/* enlarged photo frame */
+.zw .bar { cursor: default; }
+.zx { margin-left: auto; border: 0; background: none; cursor: pointer; font: 300 12px/1 var(--mono); color: var(--muted); padding: 6px; }
+.zx:hover { color: var(--ink); }
+.zw .zbody { position: relative; padding: 10px; }
+.zimg { flex: 1; position: relative; border-radius: 6px; overflow: hidden; }
+.zimg img { object-fit: contain; background: var(--bg); }
+.zcap { position: absolute; left: 12px; bottom: 10px; font: 300 11px/1.3 var(--mono); color: var(--ink); opacity: .8; background: color-mix(in srgb, var(--card) 80%, transparent); padding: 4px 8px; border-radius: 999px; }
+.zn { position: absolute; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 50%; border: 1px solid var(--ink); background: var(--card); cursor: pointer; font: 300 16px/1 var(--mono); z-index: 2; }
+.zn:hover { background: var(--ink); color: var(--bg); }
+.zn.prev { left: 18px; } .zn.next { right: 18px; }
 
 /* chrome */
 #hint {
@@ -211,29 +242,42 @@ button { font: inherit; color: inherit; }
   /* ---------- edit these ---------- */
   var CONFIG = {
     name: 'Risha',
-    email: 'dm@risha.nz'
+    email: 'dm@risha.nz',
+    photo: ''            /* e.g. 'img/risha.jpg' for the about section */
   };
-  /* Photos: add src:'my-photo.jpg' to any tile. Every project / event is a gallery window
-     followed by an info window (what it was, your role, gear). Copy a pair to add another. */
+  /* PHOTOGRAPHY: one window per event.
+       photos: up to 6 image paths (e.g. 'img/denzel-1.jpg'). Clicking one grows it into a bigger frame on the board.
+       album:  your Lightroom share link for the full set.
+     Add an event by copying one of the entries below. */
+  var EV = { w: 300, h: 384, type: 'event' };
+  function ev(o) { var r = { w: EV.w, h: EV.h, type: EV.type, album: '', photos: [] }; for (var k in o) r[k] = o[k]; return r; }
+  var CANON_BOTH = 'Canon EOS 1200D · 18–55mm + 55–200mm · Lightroom';
+  var CANON_KIT = 'Canon EOS 1200D · 18–55mm · Lightroom';
+  var IPHONE = 'iPhone 17 Pro Max · Lightroom';
+
   var BRANCHES = [
-    { id: 'photography', label: 'photography', angle: -150, wins: [
-      { title: 'event 01 / gallery', w: 340, h: 280, type: 'grid', cols: 2, rows: 2,
-        tiles: [{ cap: 'Crowd, wide' }, { cap: 'Stage, backlit' }, { cap: 'Backstage' }, { cap: 'Portrait' }] },
-      { title: 'event 01 / the shoot', w: 300, h: 300, type: 'info', kick: 'event 01 · live night',
-        head: 'Night at the venue',
-        text: 'A short note on what the event was, who it was for, and what you were asked to capture.',
-        rows: [['role', 'event photographer'], ['gear', 'mirrorless + 35mm prime'], ['light', 'available + one flash']] },
-      { title: 'event 02 / gallery', w: 340, h: 280, type: 'grid', cols: 3, rows: 2,
-        tiles: [{ cap: 'Frame 1' }, { cap: 'Frame 2' }, { cap: 'Frame 3' }, { cap: 'Frame 4' }, { cap: 'Frame 5' }, { cap: 'Frame 6' }] },
-      { title: 'event 02 / the shoot', w: 300, h: 300, type: 'info', kick: 'event 02 · on film',
-        head: 'Daytime on 35mm',
-        text: 'Same idea, different kit. Describe the event, the look you were after and how the gear shaped it.',
-        rows: [['role', 'photographer'], ['gear', '35mm film camera'], ['stock', 'colour negative, 400']] }
+    { id: 'photography', label: 'photography', angle: -150, wangle: -180, lanes: 2, wins: [
+      ev({ title: 'denzel curry', head: 'Denzel Curry', date: '16 + 18 May 2026', venue: 'NOIR Sydney · National Art School', gear: CANON_BOTH }),
+      ev({ title: 'jid & jordan ward', head: 'JID & Jordan Ward', date: '20 May 2026', venue: 'Hordern Pavilion', gear: IPHONE }),
+      ev({ title: 'snackpack', head: 'Snackpack', date: '', venue: 'Oxford Art Factory',
+           lineup: 'Domengo · Alta Rico · Ekam! and more local artists', gear: CANON_BOTH }),
+      ev({ title: 'leon thomas', head: 'Leon Thomas', date: '18 Jun 2026', venue: 'NOIR Sydney', gear: CANON_KIT }),
+      ev({ title: 'lucy bedroque & 9lives', head: 'Lucy Bedroque & 9lives', date: '7 Jul 2026', venue: 'Hordern Pavilion', gear: IPHONE }),
+      { title: 'move my way', w: 400, h: 440, type: 'festival', feat: true, head: 'Move My Way', date: '3 Oct 2026', venue: 'Carriageworks',
+        artists: [{ name: 'Freddie Gibbs', photo: '' }, { name: 'Kokoroko', photo: '' }, { name: 'Xmunashe', photo: '' }, { name: 'Sampa the Great', photo: '' }],
+        gear: IPHONE, album: '', photos: [] },
+      ev({ title: 'lonely souljaz + friends', head: 'Lonely Souljaz & Zaqquack, & Jonny Chopps', date: '21 Oct 2026', venue: 'Parramatta Lanes',
+           lineup: 'Filldaparty · Kenny Bounce · Cult Shotta · Lil Golo · 4ortune · Jords', gear: CANON_KIT }),
+      ev({ title: 'esha tewari', head: 'Esha Tewari', date: '22 Oct 2026', venue: 'Parramatta Lanes', gear: CANON_BOTH }),
+      ev({ title: 'sinn6r', head: 'Sinn6r', date: '', venue: 'Oxford Art Factory', slots: 4,
+           lineup: 'Only a few frames from this one, so the edit is the main piece.', gear: '',
+           goto: 'videography:3', gotoLabel: 'watch the edit' })
     ] },
     { id: 'videography', label: 'videography', angle: -90, wins: [
-      { title: 'showreel 2026', w: 340, h: 270, type: 'video', time: '01:24', name: 'Showreel 2026', sub: 'direction · edit · grade' },
-      { title: 'music video', w: 300, h: 250, type: 'video', time: '03:12', name: 'Music video', sub: 'edit · colour' },
-      { title: 'short film', w: 300, h: 250, type: 'video', time: '07:40', name: 'Short film', sub: 'written · shot · cut' }
+      { title: 'showreel 2026', w: 340, h: 270, type: 'video', time: '01:24', name: 'Showreel 2026', sub: 'direction · edit · grade', href: '' },
+      { title: 'music video', w: 300, h: 250, type: 'video', time: '03:12', name: 'Music video', sub: 'edit · colour', href: '' },
+      { title: 'short film', w: 300, h: 250, type: 'video', time: '07:40', name: 'Short film', sub: 'written · shot · cut', href: '' },
+      { title: 'sinn6r @ oxford art factory', w: 340, h: 270, type: 'video', time: '', name: 'Sinn6r @ Oxford Art Factory', sub: 'live edit', href: '' }
     ] },
     { id: 'design', label: 'design', angle: -30, wins: [
       { title: 'society rebrand / gallery', w: 340, h: 280, type: 'grid', cols: 2, rows: 2,
@@ -263,20 +307,21 @@ button { font: inherit; color: inherit; }
     ] }
   ];
   /* layout (tested for no overlaps) */
-  var R = 400, D0 = 300, STEP = 240, OFF = 180;
+  var R = 400, D0 = 300, STEP = 240, OFF = 180, D0L = 320, COLGAP = 45, ROWGAP = 30, ROWSHIFT = 70;
 
   var vp = document.getElementById('viewport'), world = document.getElementById('world'),
       svg = document.getElementById('lines'), nameEl = document.getElementById('name'),
       hint = document.getElementById('hint'), toolbar = document.getElementById('toolbar');
   var NS = 'http://www.w3.org/2000/svg';
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var vw = 0, vh = 0, cam = { x: 0, y: 0, k: 1 }, phase = 'intro', tween = null, focusId = null, zTop = 10;
+  var vw = 0, vh = 0, cam = { x: 0, y: 0, k: 1 }, phase = 'intro', tween = null, focusId = null, zTop = 10, zoomState = null;
 
   nameEl.textContent = CONFIG.name;
 
   function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function mk(tag, attrs) { var el = document.createElementNS(NS, tag); for (var k in attrs) el.setAttribute(k, attrs[k]); return el; }
+  function imgTag(src, alt) { return src ? '<img src="' + esc(src) + '" alt="' + esc(alt) + '" onerror="this.remove()">' : ''; }
 
   /* ---------- camera ---------- */
   function apply() {
@@ -317,19 +362,63 @@ button { font: inherit; color: inherit; }
   }
 
   /* ---------- window content ---------- */
+  function itemsOf(w) {
+    var items = [], i, ph = w.photos || [];
+    if (w.type === 'event') {
+      for (i = 0; i < (w.slots || 6); i++) items.push({ src: ph[i] || '', cap: w.head + ' · photo ' + (i + 1), cls: 'p' + (i % 4) });
+    } else if (w.type === 'festival') {
+      w.artists.forEach(function (a, k) { items.push({ src: a.photo || '', cap: a.name, cls: 'p' + (k % 4) }); });
+      for (i = 0; i < 6; i++) items.push({ src: ph[i] || '', cap: w.head + ' · photo ' + (i + 1), cls: 'p' + ((i + 1) % 4) });
+    } else if (w.type === 'grid') {
+      items = w.tiles.map(function (t, k) { return { src: t.src || '', cap: t.cap, cls: 'p' + (k % 4) }; });
+    }
+    return items;
+  }
+  function thumb(w, i, extra) {
+    var it = itemsOf(w)[i];
+    return '<button type="button" class="ph zm ' + it.cls + (extra ? ' ' + extra : '') + '" data-zi="' + i + '" aria-label="Enlarge: ' + esc(it.cap) + '">' + imgTag(it.src, it.cap) + '</button>';
+  }
+  function linkBlock(w) {
+    if (w.goto) return '<button type="button" class="album" data-goto="' + esc(w.goto) + '">' + esc(w.gotoLabel || 'open') + ' &rarr;</button>';
+    if (w.album) return '<a class="album" href="' + esc(w.album) + '" target="_blank" rel="noopener">view the full set on Lightroom &rarr;</a>';
+    return '<span class="album soon">Lightroom link to add</span>';
+  }
   function render(w) {
-    var t = w.type, h = '';
-    if (t === 'grid') {
+    var t = w.type, h = '', i;
+    if (t === 'event') {
+      var n = w.slots || 6, tl = '';
+      for (i = 0; i < n; i++) tl += thumb(w, i);
+      h = '<div class="grid ev' + (n <= 4 ? ' four' : '') + '">' + tl + '</div>' +
+        '<div class="kick">' + esc([w.date, w.venue].filter(Boolean).join(' · ')) + '</div>' +
+        '<div class="ttl sm">' + esc(w.head) + '</div>' +
+        (w.lineup ? '<div class="sub">' + esc(w.lineup) + '</div>' : '') +
+        (w.gear ? '<div class="gear">' + esc(w.gear) + '</div>' : '') +
+        linkBlock(w);
+    } else if (t === 'festival') {
+      var ar = '', st = '';
+      w.artists.forEach(function (a, k) {
+        ar += '<button type="button" class="ph artist zm p' + (k % 4) + '" data-zi="' + k + '" aria-label="Enlarge: ' + esc(a.name) + '">' + imgTag(a.photo, a.name) + '<small>featured</small><b>' + esc(a.name) + '</b></button>';
+      });
+      for (i = 0; i < 6; i++) st += thumb(w, w.artists.length + i);
+      h = '<div class="kick">festival · ' + esc([w.date, w.venue].filter(Boolean).join(' · ')) + '</div>' +
+        '<div class="ttl lg">' + esc(w.head) + '</div>' +
+        '<div class="artists">' + ar + '</div>' +
+        '<div class="strip">' + st + '</div>' +
+        (w.gear ? '<div class="gear">' + esc(w.gear) + '</div>' : '') +
+        linkBlock(w);
+    } else if (t === 'grid') {
       h = '<div class="grid" style="grid-template-columns:repeat(' + w.cols + ',1fr);grid-template-rows:repeat(' + w.rows + ',1fr)">' +
-        w.tiles.map(function (tl, i) {
-          return '<figure class="ph p' + (i % 4) + '">' + (tl.src ? '<img src="' + esc(tl.src) + '" alt="' + esc(tl.cap) + '">' : '') + '<figcaption>' + esc(tl.cap) + '</figcaption></figure>';
+        w.tiles.map(function (tl, k) {
+          var it = itemsOf(w)[k];
+          return '<button type="button" class="ph zm ' + it.cls + '" data-zi="' + k + '" aria-label="Enlarge: ' + esc(it.cap) + '">' + imgTag(it.src, it.cap) + '<span class="cap">' + esc(it.cap) + '</span></button>';
         }).join('') + '</div>';
     } else if (t === 'info') {
       h = '<div class="kick">' + esc(w.kick) + '</div><div class="ttl">' + esc(w.head) + '</div>' +
         '<div class="prose"><p>' + esc(w.text) + '</p></div>' +
         '<div class="rows">' + w.rows.map(function (r) { return '<div class="row"><b>' + esc(r[0]) + '</b><span>' + esc(r[1]) + '</span></div>'; }).join('') + '</div>';
     } else if (t === 'video') {
-      h = '<div class="ph p1 video"><span class="play"></span><div class="scrub"><i></i></div><span class="time">' + esc(w.time) + '</span></div>' +
+      var play = w.href ? '<a class="play" href="' + esc(w.href) + '" target="_blank" rel="noopener" aria-label="Watch ' + esc(w.name) + '"></a>' : '<span class="play"></span>';
+      h = '<div class="ph p1 video">' + play + '<div class="scrub"><i></i></div>' + (w.time ? '<span class="time">' + esc(w.time) + '</span>' : '') + '</div>' +
         '<div class="meta"><b>' + esc(w.name) + '</b><span>' + esc(w.sub) + '</span></div>';
     } else if (t === 'posters') {
       h = '<div class="posters">' +
@@ -349,11 +438,12 @@ button { font: inherit; color: inherit; }
     } else if (t === 'log') {
       h = '<div class="log"><b>&gt; v0.3</b> shipped the visualiser<br><b>&gt; v0.2</b> fixed the latency bug<br><b>&gt; v0.1</b> first sketch, kind of works<br><b>&gt; next</b> shaders, then docs</div>';
     } else if (t === 'about') {
-      h = '<div class="about-head"><div class="avatar"></div><div><b>' + esc(CONFIG.name) + '</b><span>photographer · filmmaker · designer</span></div></div>' +
+      var av = CONFIG.photo ? '<img class="avatar" src="' + esc(CONFIG.photo) + '" alt="' + esc(CONFIG.name) + '" onerror="this.outerHTML=\'<div class=avatar></div>\'">' : '<div class="avatar"></div>';
+      h = '<div class="about-head">' + av + '<div><b>' + esc(CONFIG.name) + '</b><span>photographer · filmmaker · designer</span></div></div>' +
         '<div class="prose"><p>I shoot events, cut films, design identities for student societies, and build the occasional tool that does something odd.</p>' +
         '<p>Most of my work starts as a small curiosity and ends up as a series. Swap this for a few honest sentences in your own voice.</p></div>';
     } else if (t === 'currently') {
-      h = '<div class="rows"><div class="row"><b>Shooting</b><span>35mm, weekends</span></div><div class="row"><b>Making</b><span>a short film</span></div><div class="row"><b>Learning</b><span>shaders</span></div><div class="row"><b>Listening</b><span>too much</span></div></div>';
+      h = '<div class="rows"><div class="row"><b>Shooting</b><span>live music, weekends</span></div><div class="row"><b>Making</b><span>a short film</span></div><div class="row"><b>Learning</b><span>shaders</span></div><div class="row"><b>Listening</b><span>too much</span></div></div>';
     } else if (t === 'mail') {
       h = '<div class="prose"><p>Open to commissions, collaborations and strange ideas.</p></div>' +
         '<div class="mail" id="mailtext">' + esc(CONFIG.email) + '</div>' +
@@ -381,7 +471,8 @@ button { font: inherit; color: inherit; }
     return 'M' + a.x + ' ' + a.y + 'C' + a.x + ' ' + (a.y + dy * .62) + ' ' + b.x + ' ' + (b.y - dy * .62) + ' ' + b.x + ' ' + b.y;
   }
   function place(w) { w.el.style.left = (w.x - w.w / 2) + 'px'; w.el.style.top = (w.y - w.h / 2) + 'px'; }
-  function parentPt(b, j) { return j === 0 ? b.pos : b.wins[j - 1]; }
+  function parentIdx(b, j) { var L = b.lanes || 1; return j < L ? -1 : j - L; }
+  function parentPt(b, j) { var i = parentIdx(b, j); return i < 0 ? b.pos : b.wins[i]; }
   function updateConn(b, j) {
     var w = b.wins[j], p = parentPt(b, j);
     w.conn.setAttribute('d', connPath({ x: p.x, y: p.y }, { x: w.x, y: w.y }));
@@ -394,8 +485,10 @@ button { font: inherit; color: inherit; }
   }
 
   BRANCHES.forEach(function (b, bi) {
-    var a = b.angle * Math.PI / 180, d = { x: Math.cos(a), y: Math.sin(a) }, p = { x: -d.y, y: d.x };
-    b.pos = { x: R * d.x, y: R * d.y };
+    var a = b.angle * Math.PI / 180, nd = { x: Math.cos(a), y: Math.sin(a) };
+    var wa = (b.wangle != null ? b.wangle : b.angle) * Math.PI / 180, d = { x: Math.cos(wa), y: Math.sin(wa) }, p = { x: -d.y, y: d.x };
+    var L = b.lanes || 1, colX = [], c, q, mw, cw = [], acc;
+    b.pos = { x: R * nd.x, y: R * nd.y };
     b.stem = mk('path', { 'class': 'stem', pathLength: 1, d: stemPath(b.pos, bi) });
     svg.appendChild(b.stem);
 
@@ -405,16 +498,27 @@ button { font: inherit; color: inherit; }
     b.node.style.left = b.pos.x + 'px'; b.node.style.top = b.pos.y + 'px';
     world.appendChild(b.node);
 
+    if (L > 1) {
+      var ncols = Math.ceil(b.wins.length / L);
+      for (c = 0; c < ncols; c++) { mw = 0; for (q = 0; q < L; q++) { if (b.wins[c * L + q]) mw = Math.max(mw, b.wins[c * L + q].w); } cw.push(mw); }
+      acc = D0L - cw[0] / 2;
+      for (c = 0; c < ncols; c++) { colX.push(acc + cw[c] / 2); acc += cw[c] + COLGAP; }
+    }
+
     b.wins.forEach(function (w, j) {
-      var s = (j % 2 ? 1 : -1) * OFF, dist = D0 + j * STEP;
+      var col = Math.floor(j / L), lane = j % L, s, dist, sgn;
+      if (L > 1) { sgn = lane ? -1 : 1; s = sgn * (w.h / 2 + ROWGAP / 2) + ROWSHIFT; dist = colX[col]; }
+      else { sgn = col % 2 ? 1 : -1; s = sgn * OFF; dist = D0 + col * STEP; }
       w.x = b.pos.x + d.x * dist + p.x * s; w.y = b.pos.y + d.y * dist + p.y * s;
+      w.out = { x: p.x * sgn, y: p.y * sgn };
       w.conn = mk('path', { 'class': 'conn', pathLength: 1 });
       svg.appendChild(w.conn);
       w.el = document.createElement('div');
-      w.el.className = 'win'; w.el.inert = true;
+      w.el.className = 'win' + (w.feat ? ' feat' : ''); w.el.inert = true;
       w.el.setAttribute('role', 'group'); w.el.setAttribute('aria-label', b.label + ': ' + w.title);
       w.el.style.width = w.w + 'px'; w.el.style.height = w.h + 'px';
       w.el.innerHTML = '<div class="inner"><div class="bar"><i></i><i></i><i></i><span>' + esc(b.label + ' / ' + w.title) + '</span></div><div class="body">' + render(w) + '</div></div><b class="h a"></b><b class="h b"></b><b class="h c"></b><b class="h d"></b>';
+      w.el.__info = { b: b, w: w };
       world.appendChild(w.el);
       place(w);
     });
@@ -433,7 +537,7 @@ button { font: inherit; color: inherit; }
         if (!drag || e.pointerId !== drag.id) return;
         w.x += (e.clientX - drag.x) / cam.k; w.y += (e.clientY - drag.y) / cam.k;
         drag.x = e.clientX; drag.y = e.clientY;
-        place(w); updateConn(b, j); if (b.wins[j + 1]) updateConn(b, j + 1);
+        place(w); updateConn(b, j); b.wins.forEach(function (ch, ci) { if (parentIdx(b, ci) === j) updateConn(b, ci); });
       });
       function end(e) { if (drag && e.pointerId === drag.id) { drag = null; bar.style.cursor = ''; } }
       bar.addEventListener('pointerup', end); bar.addEventListener('pointercancel', end);
@@ -456,12 +560,14 @@ button { font: inherit; color: inherit; }
   function openBranch(b) {
     b.open = true; b.node.classList.add('open'); b.node.setAttribute('aria-expanded', 'true');
     b.wins.forEach(function (w, j) {
-      w.conn.style.transitionDelay = (j * .22) + 's';
-      w.el.style.transitionDelay = (.3 + j * .22) + 's';
+      var step = Math.floor(j / (b.lanes || 1));
+      w.conn.style.transitionDelay = (step * .22) + 's';
+      w.el.style.transitionDelay = (.3 + step * .22) + 's';
       w.conn.classList.add('show'); w.el.classList.add('show'); w.el.inert = false;
     });
   }
   function closeBranch(b) {
+    if (zoomState && zoomState.b === b) closeZoom(false);
     b.open = false; b.node.classList.remove('open'); b.node.setAttribute('aria-expanded', 'false');
     b.wins.forEach(function (w) {
       w.conn.style.transitionDelay = '0s'; w.el.style.transitionDelay = '0s';
@@ -474,7 +580,61 @@ button { font: inherit; color: inherit; }
     else if (focusId !== b.id) { focusId = b.id; fly(focusCam(b), 1100); }
     else { closeBranch(b); focusId = null; fly(overviewCam(), 1100); }
   }
-  function goHome() { focusId = null; select(null); fly(overviewCam(), 1200); }
+  function goHome() { closeZoom(false); focusId = null; select(null); fly(overviewCam(), 1200); }
+
+  function gotoWin(spec) {
+    var parts = spec.split(':'), b = BRANCHES.filter(function (x) { return x.id === parts[0]; })[0], w = b && b.wins[+parts[1]];
+    if (!b || !w) return;
+    closeZoom(false);
+    if (!b.open) openBranch(b);
+    focusId = b.id; select(w);
+    var pad = 150;
+    fly({ x: w.x, y: w.y, k: clamp(Math.min(vw / (w.w + pad * 2), vh / (w.h + pad * 2)), .18, 1) }, 1700);
+  }
+
+  /* ---------- enlarged photo, grown on the board ---------- */
+  function paintZoom(z) {
+    var it = z.items[z.idx], box = z.el.querySelector('.zimg');
+    box.className = 'zimg ph ' + it.cls;
+    box.innerHTML = imgTag(it.src, it.cap) + '<span class="zcap">' + esc(it.cap) + '</span>';
+    z.el.querySelector('.ztitle').textContent = z.b.label + ' / ' + z.host.title + ' / ' + (z.idx + 1) + ' of ' + z.items.length;
+  }
+  function openZoom(host, items, idx) {
+    var b = host.b, w = host.w, Zw = 540, Zh = 440;
+    closeZoom(false);
+    var o = w.out, dist = ((w.w + Zw) / 2) * Math.abs(o.x) + ((w.h + Zh) / 2) * Math.abs(o.y) + 70;
+    var z = { b: b, host: w, items: items, idx: idx, w: Zw, h: Zh, x: w.x + o.x * dist, y: w.y + o.y * dist };
+    z.conn = mk('path', { 'class': 'conn', pathLength: 1, d: connPath({ x: w.x, y: w.y }, { x: z.x, y: z.y }) });
+    svg.appendChild(z.conn);
+    z.el = document.createElement('div');
+    z.el.className = 'win zw';
+    z.el.style.width = Zw + 'px'; z.el.style.height = Zh + 'px';
+    z.el.style.left = (z.x - Zw / 2) + 'px'; z.el.style.top = (z.y - Zh / 2) + 'px';
+    z.el.style.setProperty('--fx', (w.x - z.x) + 'px'); z.el.style.setProperty('--fy', (w.y - z.y) + 'px');
+    z.el.style.zIndex = ++zTop;
+    z.el.innerHTML = '<div class="inner"><div class="bar"><i></i><i></i><i></i><span class="ztitle"></span><button type="button" class="zx" data-zclose aria-label="Close photo">close</button></div>' +
+      '<div class="body zbody"><div class="zimg ph"></div>' +
+      (items.length > 1 ? '<button type="button" class="zn prev" data-zn="-1" aria-label="Previous photo">&lsaquo;</button><button type="button" class="zn next" data-zn="1" aria-label="Next photo">&rsaquo;</button>' : '') +
+      '</div></div>';
+    world.appendChild(z.el);
+    paintZoom(z);
+    zoomState = z;
+    void z.el.offsetWidth;
+    z.conn.style.transitionDelay = '0s'; z.el.style.transitionDelay = '.25s';
+    z.conn.classList.add('show'); z.el.classList.add('show');
+    var x0 = Math.min(w.x - w.w / 2, z.x - Zw / 2), x1 = Math.max(w.x + w.w / 2, z.x + Zw / 2),
+        y0 = Math.min(w.y - w.h / 2, z.y - Zh / 2), y1 = Math.max(w.y + w.h / 2, z.y + Zh / 2), pad = 80;
+    fly({ x: (x0 + x1) / 2, y: (y0 + y1) / 2, k: clamp(Math.min(vw / (x1 - x0 + pad * 2), vh / (y1 - y0 + pad * 2)), .18, 1.1) }, 1200);
+  }
+  function closeZoom(returnCam) {
+    var z = zoomState;
+    if (!z) return;
+    zoomState = null;
+    z.conn.style.transitionDelay = '0s'; z.el.style.transitionDelay = '0s';
+    z.conn.classList.remove('show'); z.el.classList.remove('show'); z.el.inert = true;
+    setTimeout(function () { z.el.remove(); z.conn.remove(); }, 1100);
+    if (returnCam && phase === 'map') fly(focusCam(z.b), 1000);
+  }
 
   function begin() {
     phase = 'map'; vp.classList.remove('intro');
@@ -521,15 +681,30 @@ button { font: inherit; color: inherit; }
   document.getElementById('zin').addEventListener('click', function () { fly({ x: cam.x, y: cam.y, k: clamp(cam.k * 1.3, .15, 2.2) }, 350); });
   document.getElementById('zout').addEventListener('click', function () { fly({ x: cam.x, y: cam.y, k: clamp(cam.k / 1.3, .15, 2.2) }, 350); });
   document.getElementById('home').addEventListener('click', goHome);
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && phase === 'map') goHome(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape' || phase !== 'map') return;
+    if (zoomState) closeZoom(true); else goHome();
+  });
 
-  /* copy email */
+  /* clicks inside windows: enlarge a photo, step through photos, jump to another window, copy email */
   world.addEventListener('click', function (e) {
-    var btn = e.target.closest('[data-copy]');
+    var t = e.target, el;
+    if ((el = t.closest('[data-zclose]'))) { closeZoom(true); return; }
+    if ((el = t.closest('[data-zn]'))) {
+      if (zoomState) { var n = zoomState.items.length; zoomState.idx = (zoomState.idx + (+el.getAttribute('data-zn')) + n) % n; paintZoom(zoomState); }
+      return;
+    }
+    if ((el = t.closest('[data-zi]'))) {
+      var host = el.closest('.win');
+      if (host && host.__info) openZoom(host.__info, itemsOf(host.__info.w), +el.getAttribute('data-zi'));
+      return;
+    }
+    if ((el = t.closest('[data-goto]'))) { gotoWin(el.getAttribute('data-goto')); return; }
+    var btn = t.closest('[data-copy]');
     if (!btn) return;
     function fallback() {
-      var el = document.getElementById('mailtext'), range = document.createRange();
-      range.selectNodeContents(el); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+      var m = document.getElementById('mailtext'), range = document.createRange();
+      range.selectNodeContents(m); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
       btn.textContent = 'press ctrl/cmd + c';
     }
     try {
