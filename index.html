@@ -1,4 +1,4 @@
-<title>Portfolio Mindmap</title>
+<title>Risha's Work . ݁⋆˖ ݁♬⋆.˚𝄞⋆ ⋆</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@300;400&family=Outfit:wght@200;300;400&display=swap">
@@ -131,6 +131,9 @@ button.ph:hover { box-shadow: 0 0 0 1px var(--accent); }
 .artist { height: 104px; }
 .artist b { position: absolute; left: 10px; right: 8px; bottom: 9px; font: 300 22px/1.05 var(--display); color: var(--ink); }
 .artist small { position: absolute; left: 10px; top: 9px; font: 300 8.5px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); opacity: .65; }
+.artists.three { grid-template-columns: repeat(3, 1fr); }
+.artists.three .artist { height: 122px; }
+.artists.three .artist b { font-size: 16px; line-height: 1.1; }
 .strip { flex: none; display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; height: 44px; }
 .video { flex: 1; display: grid; place-items: center; }
 .play { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--ink); display: grid; place-items: center; }
@@ -266,8 +269,9 @@ a.play:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); }
       { title: 'move my way', w: 400, h: 440, type: 'festival', feat: true, head: 'Move My Way', date: '3 Oct 2026', venue: 'Carriageworks',
         artists: [{ name: 'Freddie Gibbs', photo: '' }, { name: 'Kokoroko', photo: '' }, { name: 'Xmunashe', photo: '' }, { name: 'Sampa the Great', photo: '' }],
         gear: IPHONE, album: '', photos: [] },
-      ev({ title: 'lonely souljaz + friends', head: 'Lonely Souljaz & Zaqquack, & Jonny Chopps', date: '21 Oct 2026', venue: 'Parramatta Lanes',
-           lineup: 'Filldaparty · Kenny Bounce · Cult Shotta · Lil Golo · 4ortune · Jords', gear: CANON_KIT }),
+      { title: 'parramatta lanes', w: 400, h: 400, type: 'festival', feat: true, kind: 'event', head: 'Parramatta Lanes', date: '21 Oct 2026', venue: '',
+        artists: [{ name: 'Lonely Souljaz', photo: '' }, { name: 'Jonny Chopps', photo: '' }, { name: 'Zaqquack + Filldaparty', photo: '' }],
+        lineup: 'Also on: Kenny Bounce · Cult Shotta · Lil Golo · 4ortune · Jords', gear: CANON_KIT, album: '', photos: [] },
       ev({ title: 'esha tewari', head: 'Esha Tewari', date: '22 Oct 2026', venue: 'Parramatta Lanes', gear: CANON_BOTH }),
       ev({ title: 'sinn6r', head: 'Sinn6r', date: '', venue: 'Oxford Art Factory', slots: 4,
            lineup: 'Only a few frames from this one, so the edit is the main piece.', gear: '',
@@ -400,10 +404,11 @@ a.play:hover { background: color-mix(in srgb, var(--ink) 10%, transparent); }
         ar += '<button type="button" class="ph artist zm p' + (k % 4) + '" data-zi="' + k + '" aria-label="Enlarge: ' + esc(a.name) + '">' + imgTag(a.photo, a.name) + '<small>featured</small><b>' + esc(a.name) + '</b></button>';
       });
       for (i = 0; i < 6; i++) st += thumb(w, w.artists.length + i);
-      h = '<div class="kick">festival · ' + esc([w.date, w.venue].filter(Boolean).join(' · ')) + '</div>' +
+      h = '<div class="kick">' + esc(w.kind || 'festival') + ' · ' + esc([w.date, w.venue].filter(Boolean).join(' · ')) + '</div>' +
         '<div class="ttl lg">' + esc(w.head) + '</div>' +
-        '<div class="artists">' + ar + '</div>' +
+        '<div class="artists' + (w.artists.length === 3 ? ' three' : '') + '">' + ar + '</div>' +
         '<div class="strip">' + st + '</div>' +
+        (w.lineup ? '<div class="sub">' + esc(w.lineup) + '</div>' : '') +
         (w.gear ? '<div class="gear">' + esc(w.gear) + '</div>' : '') +
         linkBlock(w);
     } else if (t === 'grid') {
